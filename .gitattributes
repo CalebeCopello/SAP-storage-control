@@ -1,0 +1,13 @@
+# Default — treat all files as text with LF
+* text=auto eol=lf
+
+# Windows batch files must use CRLF or they break on Windows
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary files — never touch line endings
+*.jar binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
