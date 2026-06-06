@@ -1,47 +1,15 @@
-# docker-compose.dev.yml — development overrides
-# Adds hot-reload for both backend and frontend.
-#
-# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-# Or add an alias in your shell:
-#   alias dcdev="docker compose -f docker-compose.yml -f docker-compose.dev.yml"
-
 services:
-
-  # ── Backend dev: run with Spring Boot DevTools ──────────────────────────────
-  # Instead of the built JAR, we mount the source and run Maven directly.
-  # Spring Boot DevTools watches for .class changes and restarts automatically.
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev    # a lighter image that just runs mvn spring-boot:run
-    volumes:
-      - ./backend:/app              # mount source so changes are visible
-      - maven_cache:/root/.m2       # cache Maven deps between restarts
-    environment:
-      SPRING_PROFILES_ACTIVE: docker,dev
-    ports:
-      - "8080:8080"                 # expose directly for debugging/Postman
-      - "5005:5005"                 # remote JVM debug port
-
-  # ── Frontend dev: Angular CLI dev server ────────────────────────────────────
-  # Bypasses the Nginx in the frontend container — the CLI's own server
-  # handles live-reload (HMR).
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    image: sc_frontend_dev
+    container_name: sc_frontend_dev
     volumes:
       - ./frontend:/app
-      - node_modules:/app/node_modules   # keep node_modules inside container
+      - /app/node_modules
     ports:
-      - "4200:4200"                # Angular dev server — open this in browser
-    command: npm run start -- --host 0.0.0.0 --poll 500
-
-  # ── DB: expose port and use a dev-specific init script ──────────────────────
-  db:
-    ports:
-      - "5432:5432"   # already in base file, repeated here for clarity
-
-volumes:
-  maven_cache:
-  node_modules:
+      - "4200:4200"
+    command: npx ng serve --host 0.0.0.0 --poll 500
+    networks:
+      - sc_network
