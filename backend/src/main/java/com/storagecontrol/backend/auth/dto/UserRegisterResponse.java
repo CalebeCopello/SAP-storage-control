@@ -3,7 +3,7 @@ package com.storagecontrol.backend.auth.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record UserResponse (
+public record UserRegisterResponse (
     UUID id,
     String name,
     String email,
