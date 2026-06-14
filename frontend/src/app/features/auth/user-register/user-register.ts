@@ -38,7 +38,7 @@ export class UserRegister {
   onSubmit(): void {
     if (this.registerForm.invalid) return;
 
-    this.http.post(`${environment.apiUrl}/api/auth/register`, this.registerForm.value).subscribe({
+    this.http.post(`${environment.apiUrl}/auth/register`, this.registerForm.value).subscribe({
       next: (res) => console.log('Success: ', res),
       error: (err) => console.error('Error: ', err),
     });
