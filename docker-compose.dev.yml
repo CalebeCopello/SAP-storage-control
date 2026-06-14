@@ -13,3 +13,7 @@ services:
     command: npx ng serve --host 0.0.0.0 --poll 500
     networks:
       - sc_network
+networks:
+  sc_network:
+    external: true
+    name: sap-storage-control_sc_network
