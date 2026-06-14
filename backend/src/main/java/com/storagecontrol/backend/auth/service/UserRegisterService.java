@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,8 @@ import com.storagecontrol.backend.auth.dto.UserRegisterRequest;
 import com.storagecontrol.backend.auth.dto.UserRegisterResponse;
 import com.storagecontrol.backend.auth.repository.UserRepository;
 import com.storagecontrol.backend.domain.User;
+import com.storagecontrol.backend.exception.BusinessException;
+
 
 @Service
 @Transactional(readOnly = true)
@@ -29,7 +32,7 @@ public class UserRegisterService {
     @Transactional
     public UserRegisterResponse register(UserRegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new BusinessException("Email already in use", HttpStatus.CONFLICT);
         }
 
         User user = new User();
@@ -50,13 +53,13 @@ public class UserRegisterService {
     public UserRegisterResponse findById(UUID id) {
         return userRepository.findById(Objects.requireNonNull(id))
             .map(UserRegisterResponse::from)
-            .orElseThrow(() -> new IllegalArgumentException("User not found" + id));
+            .orElseThrow(() -> new BusinessException("User not found: " + id, HttpStatus.NOT_FOUND));
     }
 
     @Transactional
     public void softDelete(UUID id) {
         User user = userRepository.findById(Objects.requireNonNull(id))
-            .orElseThrow(() -> new IllegalArgumentException("User not found" + id));
+            .orElseThrow(() -> new BusinessException("User not found: " + id, HttpStatus.NOT_FOUND));
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
     }
