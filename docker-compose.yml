@@ -39,6 +39,8 @@ services:
         condition: service_healthy
     networks:
       - sc_network
+    ports:
+      - "8080:8080"
 
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
