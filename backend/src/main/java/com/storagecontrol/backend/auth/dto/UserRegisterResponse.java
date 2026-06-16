@@ -10,7 +10,9 @@ public record UserRegisterResponse (
     String name,
     String email,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    String message,
+    String type
 ){
     public static UserRegisterResponse from(User user) {
         return new UserRegisterResponse(
@@ -18,7 +20,9 @@ public record UserRegisterResponse (
             user.getName(),
             user.getEmail(),
             user.getCreatedAt(),
-            user.getUpdatedAt()
+            user.getUpdatedAt(),
+            "User " + user.getName() + " created successfully!",
+            "success"
         );
     }
 }

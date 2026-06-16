@@ -4,28 +4,74 @@
     <mat-card-subtitle>Preencha o formulário para criar sua conta</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
+    @for (alert of alerts; track $index) {
+      <div class="alert alert-{{ alert.type }} alert-dismissible fade show" role="alert">
+        {{ alert.message }}
+        <button type="button" class="btn-close" (click)="alerts.splice($index, 1)"></button>
+      </div>
+    }
+
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input matInput formControlName="name" placeholder="João da Silva" />
-          <mat-icon matSuffix>person</mat-icon>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" type="email" placeholder="joao.silva@gmail.com" />
-          <mat-icon matSuffix>email</mat-icon>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Senha</mat-label>
-          <input matInput formControlName="password" type="password" />
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Confirmar senha</mat-label>
-          <input matInput formControlName="confirmPassword" type="password" />
-        </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">
-          Register
-        </button>
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="name" placeholder="João da Silva" />
+        <mat-icon matSuffix>person</mat-icon>
+        @if (registerForm.get('name')?.hasError('required') && registerForm.get('name')?.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+        @if (registerForm.get('name')?.hasError('serverError')) {
+          <mat-error>{{ registerForm.get('name')?.getError('serverError') }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="joao.silva@gmail.com" />
+        <mat-icon matSuffix>email</mat-icon>
+        @if (
+          registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched
+        ) {
+          <mat-error>Email é obrigatório</mat-error>
+        }
+        @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+          <mat-error>Email inválido</mat-error>
+        }
+        @if (registerForm.get('email')?.hasError('emailInUse')) {
+          <mat-error>Este email já está em uso</mat-error>
+        }
+        @if (registerForm.get('email')?.hasError('serverError')) {
+          <mat-error>{{ registerForm.get('email')?.getError('serverError') }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <input matInput formControlName="password" type="password" />
+        @if (
+          registerForm.get('password')?.hasError('required') &&
+          registerForm.get('password')?.touched
+        ) {
+          <mat-error>Senha é obrigatória</mat-error>
+        }
+        @if (
+          registerForm.get('password')?.hasError('minlength') &&
+          registerForm.get('password')?.touched
+        ) {
+          <mat-error>A senha deve ter pelo menos 8 caracteres</mat-error>
+        }
+        @if (registerForm.get('password')?.hasError('serverError')) {
+          <mat-error>{{ registerForm.get('password')?.getError('serverError') }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Confirmar senha</mat-label>
+        <input matInput formControlName="confirmPassword" type="password" />
+        @if (
+          registerForm.get('confirmPassword')?.hasError('required') &&
+          registerForm.get('confirmPassword')?.touched
+        ) {
+          <mat-error>Confirmação de senha é obrigatória</mat-error>
+        }
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Register</button>
     </form>
   </mat-card-content>
 </mat-card>
