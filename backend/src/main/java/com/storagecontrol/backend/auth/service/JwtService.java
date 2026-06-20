@@ -23,7 +23,7 @@ public class JwtService {
         this.jwtProperties = jwtProperties;
 
         this.signinKey = Keys.hmacShaKeyFor(
-            jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
+            jwtProperties.secret().getBytes(StandardCharsets.UTF_8)
         );
     }
 
@@ -33,7 +33,7 @@ public class JwtService {
         return Jwts.builder()
             .subject(email)
             .issuedAt(new Date(now))
-            .expiration(new Date(now + jwtProperties.getExpirationMs()))
+            .expiration(new Date(now + jwtProperties.expirationMs()))
             .signWith(signinKey)
             .compact();
     }
