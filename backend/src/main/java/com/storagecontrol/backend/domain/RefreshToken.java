@@ -29,7 +29,7 @@ public class RefreshToken {
     private User user;
 
 
-    @Column(name = "token_hash", nullable = false)
+    @Column(name = "token_hash", nullable = false, unique = true)
     private String tokenHash;
 
     @Column(name = "ip_address", nullable = false)
@@ -50,6 +50,8 @@ public class RefreshToken {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(nullable = false)
+    private boolean revoked = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -71,4 +73,45 @@ public class RefreshToken {
         this.expiresAt = expiresAt;
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    //Gets and setters
+
+    public UUID getId() { return id;}
+    public User getUser() {return user;}
+    public String getTokenHash() {return tokenHash;}
+    public String getIpAddress() { return ipAddress;}
+    public String getLocation() {return location;}
+    public String getUserAgent() { return userAgent;}
+    public String getBrowser() { return browser;}
+    public String getOs() { return os;}
+    public LocalDateTime getExpiresAt() {return expiresAt;}
+    public boolean isRevoked() {return revoked;}
+    public LocalDateTime getCreatedAt() {return createdAt;}
+    public LocalDateTime getUpdatedAt() {return updatedAt;}
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void revoke() {
+        this.revoked = true;
+    }
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expiresAt);
+    }
+
+    public boolean isValid() {
+        return !revoked && !isExpired();
+    }
 }
