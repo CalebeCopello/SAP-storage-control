@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HexFormat;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import com.storagecontrol.backend.auth.repository.RefreshTokenRepository;
 import com.storagecontrol.backend.config.JwtProperties;
 import com.storagecontrol.backend.domain.RefreshToken;
 import com.storagecontrol.backend.domain.User;
+import com.storagecontrol.backend.exception.BusinessException;
 
 @Service
 @Transactional
@@ -51,5 +53,25 @@ public class RefreshTokenService {
         refreshTokenRepository.save(refreshToken);
 
         return rawToken;
+    }
+
+    public RefreshToken validateRefreshToken(String rawToken) {
+        String tokenHash = null;
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            tokenHash = HexFormat.of().formatHex(hashBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
+
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash).orElseThrow(() -> new BusinessException("Refresh token not found", HttpStatus.UNAUTHORIZED));
+
+        if (!refreshToken.isValid()) {
+            throw new BusinessException("Refresh token is expired or revoked", HttpStatus.UNAUTHORIZED);
+        }
+
+        return refreshToken;
     }
 }
